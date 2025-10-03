@@ -1,3 +1,7 @@
+<a href="https://communityscale.com">
+    <img src="https://raw.githubusercontent.com/CommunityScale/media-kit/main/png/communityscale-wordmark-black.png" alt="CommunityScale Wordmark Black" height="30">
+</a>
+
 # [Website](https://communityscale.github.io/Hilliard/)
   
 This website consists of a responsive CSS boilerplate and HTML, no compiling or installing. The interactive charts are hosted indefinitely on Datawrapper. 
