@@ -171,6 +171,14 @@
                         </div>
                         <span>Focus Areas</span>
                     </label>
+                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" class="sr-only overlay-toggle peer" value="siteshilliard-fill" />
+                            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                        </div>
+                        <span>Sites Hilliard</span>
+                    </label>
                 </div>
             </div>
 
@@ -384,8 +392,8 @@
     });
 
     // Update page title and sidebar heading with county name
-    document.title = COUNTY_NAME + ', ' + STATE_NAME + ' - Map';
-    document.getElementById('map-title').textContent = COUNTY_NAME + ', ' + STATE_NAME;
+    document.title = 'Hilliard OH';
+    document.getElementById('map-title').textContent = 'Hilliard OH';
 
     // Add error logging
     map.on('error', function(e) {
@@ -579,6 +587,36 @@
         }, firstSymbolId);
 
         console.log('Added focusareas overlay layer');
+
+        // Add siteshilliard source and layer
+        map.addSource('siteshilliard-source', {
+            type: 'geojson',
+            data: 'siteshilliardwdetails.geojson'
+        });
+
+        map.addLayer({
+            id: 'siteshilliard-fill',
+            type: 'fill',
+            source: 'siteshilliard-source',
+            paint: {
+                'fill-color': [
+                    'match',
+                    ['get', 'Sites'],
+                    0, '#fbb4ae',    // light red/pink for Sites = 0
+                    3, '#b3cde3',    // light blue for Sites = 3
+                    4, '#ccebc5',    // light green for Sites = 4
+                    6, '#decbe4',    // light purple for Sites = 6
+                    '#cccccc'        // default gray for any other values
+                ],
+                'fill-opacity': 0.6,
+                'fill-outline-color': '#666666'
+            },
+            layout: {
+                visibility: 'none'
+            }
+        }, firstSymbolId);
+
+        console.log('Added siteshilliard overlay layer');
 
         // Load tract data from JSON
         fetch('CTs_USA_251016')
@@ -932,7 +970,7 @@
         const savedLayerState = currentDataLayer;
 
         // Capture visible overlay states before switching
-        const overlayLayers = ['parcels-outline', 'saledots', 'rentdots', 'focusareas-outline'];
+        const overlayLayers = ['parcels-outline', 'saledots', 'rentdots', 'focusareas-outline', 'siteshilliard-fill'];
         const visibleOverlays = overlayLayers.filter(id => {
             const layer = map.getLayer(id);
             return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
@@ -1125,6 +1163,39 @@
 
             console.log('Re-added focusareas overlay layer');
 
+            // Re-add siteshilliard overlay source and layer
+            map.addSource('siteshilliard-source', {
+                type: 'geojson',
+                data: 'siteshilliard.geojson'
+            });
+
+            map.addLayer({
+                id: 'siteshilliard-fill',
+                type: 'fill',
+                source: 'siteshilliard-source',
+                paint: {
+                    'fill-color': [
+                        'match',
+                        ['get', 'Sites'],
+                        1, '#e684b3',    // light purple for Sites = 1
+                        2, '#8dd3c7',    // light teal for Sites = 2
+                        3, '#b3cde3',    // light blue for Sites = 3
+                        4, '#ccebc5',    // light green for Sites = 4
+                        5, '#decbe4',    // light purple for Sites = 5
+                        6, '#decbe4',    // light purple for Sites = 6
+                        7, '#fed9a6',    // light orange for Sites = 7
+             
+                    ],
+                    'fill-opacity': 0.4,
+                    'fill-outline-color': '#666666'
+                },
+                layout: {
+                    visibility: 'none'
+                }
+            }, firstSymbolId);
+
+            console.log('Re-added siteshilliard overlay layer');
+
             // Restore visibility for overlays that were visible before switch
             visibleOverlays.forEach(id => {
                 if (map.getLayer(id)) {
@@ -1312,6 +1383,21 @@
     map.on('click', 'tracts-outline', showTractPopup);
     map.on('click', 'tracts-data', showTractPopup);
 
+    // Add click handler for siteshilliard layer
+    map.on('click', 'siteshilliard-fill', function(e) {
+        const properties = e.features[0].properties;
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(`
+                <div class="popup-content">
+                    <div class="popup-header">${properties.SITEADDRES || 'No Address'}</div>
+                    <p><strong>Class:</strong> ${properties.CLASSDSCRP || 'N/A'}</p>
+                    <p><strong>Acres:</strong> ${properties.ACRES ? properties.ACRES.toFixed(2) : 'N/A'}</p>
+                </div>
+            `)
+            .addTo(map);
+    });
+
     // Add click handler for county
     map.on('click', 'counties-outline', function(e) {
         const properties = e.features[0].properties;
@@ -1350,6 +1436,14 @@
     });
 
     map.on('mouseleave', 'counties-outline', function() {
+        map.getCanvas().style.cursor = '';
+    });
+
+    map.on('mouseenter', 'siteshilliard-fill', function() {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'siteshilliard-fill', function() {
         map.getCanvas().style.cursor = '';
     });
 </script>
