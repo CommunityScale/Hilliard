@@ -119,6 +119,41 @@
                     <div id="layer-description" class="mt-1 text-xs text-black leading-snug hidden">
                     </div>
                 </div>
+
+                <!-- Sites Hilliard overlay legend -->
+                <div id="sites-legend" class="mt-4 pb-4 border-t border-gray-300 pt-4 hidden">
+                    <h3 class="font-medium mb-2 text-black">Sites Categories</h3>
+                    <div class="space-y-1 text-sm text-black">
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border border-gray-300 flex-shrink-0" style="background-color: #e684b3;"></div>
+                            <span class="text-xs">Priority sites</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border border-gray-300 flex-shrink-0" style="background-color: #8dd3c7;"></div>
+                            <span class="text-xs">Old Hilliard infill after infrastructure improvements (all)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border border-gray-300 flex-shrink-0" style="background-color: #b3cde3;"></div>
+                            <span class="text-xs">Big Darby undeveloped</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border border-gray-300 flex-shrink-0" style="background-color: #ffffb3;"></div>
+                            <span class="text-xs">R2 - duplex?</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border border-gray-300 flex-shrink-0" style="background-color: #ccebc5;"></div>
+                            <span class="text-xs">R2 along corridors</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border border-gray-300 flex-shrink-0" style="background-color: #decbe4;"></div>
+                            <span class="text-xs">B1-B2 for vertical mixed use</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded border border-gray-300 flex-shrink-0" style="background-color: #fed9a6;"></div>
+                            <span class="text-xs">ADU potential</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Overlay toggle section -->
@@ -602,13 +637,16 @@
                 'fill-color': [
                     'match',
                     ['get', 'Sites'],
-                    0, '#fbb4ae',    // light red/pink for Sites = 0
+                    1, '#e684b3',    // light purple for Sites = 1
+                    2, '#8dd3c7',    // light teal for Sites = 2
                     3, '#b3cde3',    // light blue for Sites = 3
-                    4, '#ccebc5',    // light green for Sites = 4
+                    4, '#ffffb3',    // light yellow for Sites = 4
+                    5, '#ccebc5',    // light green for Sites = 5
                     6, '#decbe4',    // light purple for Sites = 6
+                    7, '#fed9a6',    // light orange for Sites = 7
                     '#cccccc'        // default gray for any other values
                 ],
-                'fill-opacity': 0.6,
+                'fill-opacity': 0.4,
                 'fill-outline-color': '#666666'
             },
             layout: {
@@ -1166,7 +1204,7 @@
             // Re-add siteshilliard overlay source and layer
             map.addSource('siteshilliard-source', {
                 type: 'geojson',
-                data: 'siteshilliard.geojson'
+                data: 'siteshilliardwdetails.geojson'
             });
 
             map.addLayer({
@@ -1180,11 +1218,11 @@
                         1, '#e684b3',    // light purple for Sites = 1
                         2, '#8dd3c7',    // light teal for Sites = 2
                         3, '#b3cde3',    // light blue for Sites = 3
-                        4, '#ccebc5',    // light green for Sites = 4
-                        5, '#decbe4',    // light purple for Sites = 5
+                        4, '#ffffb3',    // light yellow for Sites = 4
+                        5, '#ccebc5',    // light green for Sites = 5
                         6, '#decbe4',    // light purple for Sites = 6
                         7, '#fed9a6',    // light orange for Sites = 7
-             
+                        '#cccccc'        // default gray for any other values
                     ],
                     'fill-opacity': 0.4,
                     'fill-outline-color': '#666666'
@@ -1203,6 +1241,12 @@
                     console.log('Restored visibility for:', id);
                 }
             });
+
+            // Restore sites legend if siteshilliard layer was visible
+            if (visibleOverlays.includes('siteshilliard-fill')) {
+                const sitesLegend = document.getElementById('sites-legend');
+                sitesLegend.classList.remove('hidden');
+            }
 
             // Re-apply current data layer if one was selected
             console.log('Saved layer state:', savedLayerState);
@@ -1265,6 +1309,16 @@
             if (map.getLayer(layerId)) {
                 map.setLayoutProperty(layerId, 'visibility', isChecked ? 'visible' : 'none');
                 console.log('Overlay', layerId, isChecked ? 'shown' : 'hidden');
+            }
+
+            // Show/hide sites legend when siteshilliard layer is toggled
+            if (layerId === 'siteshilliard-fill') {
+                const sitesLegend = document.getElementById('sites-legend');
+                if (isChecked) {
+                    sitesLegend.classList.remove('hidden');
+                } else {
+                    sitesLegend.classList.add('hidden');
+                }
             }
         });
     });
