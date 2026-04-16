@@ -42,13 +42,13 @@ YEAR_BUILT_MAX = None   # e.g., 2020
 # Set to None to include all cities
 CITY = "Hilliard"
 
-# ============================================================
-# SCRIPT — no need to edit below this line
-# ============================================================
+# Name of the CSV file to read (must be in same directory as this script) - THIS IS ONLY THING YOU NEED TO CHANGE TO MOVE FROM RENTAL TO SALES 
 
 CSV_FILE = "rental_listings.csv"
 
-
+# ============================================================
+# SCRIPT — no need to edit below this line
+# ============================================================
 def parse_date(date_str):
     """Parse ISO date string like '2025-01-01T00:00:00.000Z' or 'YYYY-MM-DD'."""
     if not date_str or date_str in ("NA", "list()"):
